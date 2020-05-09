@@ -45,7 +45,9 @@ var toRPN = function(line){
     var noMinusLine = checkMinuses(sepLine);
     //alert(noMinusLine);
     var afterF = opn(noMinusLine);
-    alert(afterF);
+    //alert(afterF);
+    var result = count(afterF);
+    alert(result);
 }
 
 ///функция разбиения выражения на токены (2 пункт)
@@ -134,4 +136,71 @@ var opn = function(tokens){
         //alert('eбать я ща элемент вкинул');
     }
     return output;
+}
+
+///алгоритм подсчета строки ОПН
+///вход: строка в ОПН
+///выход: ответ выражения
+var count = function(line){
+    var stack = [];
+    var result;
+    var a;
+    var b;
+    var l = line.length;
+    for(var i = 0;i<l;i++){
+        if(!(operators.includes(line[i]))){
+            stack.push(line[i]);
+            //alert('ебать закинул число в стэк');
+        } else {
+            b = stack.pop();
+            a = stack.pop();
+            switch (line[i]){
+                case '+':
+                    result = sum(a,b);
+                    stack.push(result);
+                    break;
+                case '-':
+                    result = sub(a,b);
+                    stack.push(result);
+                    break;
+                case '*':
+                    result = mul(a,b);
+                    stack.push(result);
+                    break;
+                case '/':
+                    result = div(a,b);
+                    stack.push(result);
+                    break;
+                case '^':
+                    result = pow(a,b);
+                    stack.push(result);
+                    break;
+            }
+            //alert('ебать я что-то посчитал '+ result);
+        }
+    }
+    if(stack.length!=1){
+        //alert('нихуя error');
+    }
+    return stack[0];
+}
+
+var sum = function(a,b){
+    return +a + +b;
+}
+
+var sub = function(a,b){
+    return a-b;
+}
+
+var mul = function(a,b){
+    return a*b;
+}
+
+var div = function(a,b){
+    return a/b;
+}
+
+var pow = function(a,b){
+    return a**b;
 }
