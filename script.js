@@ -4,19 +4,16 @@ function noletters(){
     }*/
 }
 
-//var number = {
-    //numinator,
-    //denuminator,
-//}
-
 ///
 ///
 /// алгоритм:
 /// 1. строка заносится в var
-/// 2. строка преобразуется в опн
-/// 3. строка вычилсяется по алгоритму опн но с преобразованием операндов в дроби
-/// 4. идет проверка на сокращаемость результата
-/// 5. результат выводится на экран
+/// 2. var делится на токены
+/// 3. идет определение унарности или бинарности минусов в выражении
+/// 4. массив токенов преобразуется в опн
+/// 5. строка вычилсяется по алгоритму опн но с преобразованием операндов в дроби
+/// 6. идет проверка на сокращаемость результата
+/// 7. результат выводится на экран
 ///
 ///
 
@@ -36,37 +33,43 @@ button.onclick = function(){
 }
 
 button.ondblclick = function(){
-    torpn(line);
+    toRPN(line);
 }
 
 
 ///алгоритм преобразования в опн (2 пункт)
 ///вход: строка выражения в обычной записи
 ///выход: строка в обратной польской нотации
-var torpn = function(line){
-    var sepline = split(line);
-    for(let el of sepline){
-        if(el=''){}
-    }
-    alert(sepline);
+var toRPN = function(line){
+    var sepLine = splitIntoTokens(line);
+    alert(sepLine);
+    var noMLine = checkMinuses(sepLine);
+    alert(noMLine);
 }
 
-///алгоритм разбиения выражения на операторы и операнды
+///алгоритм разбиения выражения токены (2 пункт)
 ///вход: строка в обычной записи
-///выход: массив??
-var split = function(line){
-    ///
-    /// нужна функция, что меняет -1 на (0-1)
-    ///
-    /*for(var i;i<line.length;i++){
-        if(line[i]='-' && line[i-1]){}
-    }*/
+///выход: массив токенов
+var splitIntoTokens = function(line){
     var array = Array.from(line);
-    var i = array.length-2;
+    var i = array.length-1;
     for(var i;i>0;i--){
-        if(!(operands.includes(array[i])&&operands.includes(array[i+1]))){
-            array.splice(i+1,0,' ');
+        if(!(operands.includes(array[i-1])&&operands.includes(array[i]))){
+            array.splice(i,0,' ');
         }
     }
     return array.join('').split(' ');
+}
+
+var checkMinuses = function(tokens){
+    var i = tokens.length-1;
+    for(var i;i>0;i--){
+        if((tokens[i-1]=='(') && (tokens[i]=='-')){
+            tokens.splice(i,0,'0');
+        }
+    }
+    if(tokens[0]=='-'){
+        tokens.splice(0,0,'0');
+    }
+    return tokens;
 }
