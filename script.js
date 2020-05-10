@@ -1,4 +1,4 @@
-///
+
 ///
 /// алгоритм:
 /// 1. строка заносится в var
@@ -32,8 +32,11 @@ button.onclick = function(){
 
 button.ondblclick = function(){
     toRPN(line);
+    //var a = pow(2,(1/2));
+    //alert(a);
 
 }
+
 
 
 ///функция преобразования в опн 
@@ -46,7 +49,9 @@ var toRPN = function(line){
     //alert(noMinusLine);
     var afterF = opn(noMinusLine);
     //alert(afterF);
-    var result = count(afterF);
+    var afterA = useFractions(afterF);
+    //alert(afterA);
+    var result = count(afterA);
     alert(result);
 }
 
@@ -138,6 +143,24 @@ var opn = function(tokens){
     return output;
 }
 
+///
+///вход: массив токенов
+///выход: массив токенов-объектов
+var useFractions = function(tokens){
+    var l = tokens.length;
+    var line = [];
+    for(var i = 0;i<l;i++){
+        if(!(operators.includes(tokens[i]))){
+            var fraction = `${tokens[i]}:1`;
+            line.push(fraction);
+        }else{
+            line.push(tokens[i]);
+        }
+    }
+    //alert(line);
+    return line;//line;
+}
+
 ///алгоритм подсчета строки ОПН
 ///вход: строка в ОПН
 ///выход: ответ выражения
@@ -171,10 +194,10 @@ var count = function(line){
                     result = div(a,b);
                     stack.push(result);
                     break;
-                case '^':
+               /* case '^':
                     result = pow(a,b);
                     stack.push(result);
-                    break;
+                    break; */
             }
             //alert('ебать я что-то посчитал '+ result);
         }
@@ -186,21 +209,95 @@ var count = function(line){
 }
 
 var sum = function(a,b){
-    return +a + +b;
+    //alert(`ебать суммирую ${a} и ${b}`);
+    var lineA = a.split(':');
+    var lineB = b.split(':');
+    var numA = lineA[0];
+    var denA = lineA[1];
+    var numB = lineB[0];
+    var denB = lineB[1];
+    var numR = +(numA*denB) + +(numB*denA);
+    //alert(numR);
+    var denR = (denA*denB).toString();
+    //alert(denR);
+    var result = numR+':'+denR;
+    //alert(result);
+    return result;
 }
 
 var sub = function(a,b){
-    return a-b;
+    //alert(`ебать вычитаю ${b} из ${a}`);
+    var lineA = a.split(':');
+    var lineB = b.split(':');
+    var numA = lineA[0];
+    var denA = lineA[1];
+    var numB = lineB[0];
+    var denB = lineB[1];
+    var numR = +(numA*denB) - +(numB*denA);
+    var denR = (denA*denB).toString();
+    var result = numR+':'+denR;
+    return result;
 }
 
 var mul = function(a,b){
-    return a*b;
+    //alert(`ебать умножаю ${a} и ${b}`);
+    var lineA = a.split(':');
+    var lineB = b.split(':');
+    var numA = lineA[0];
+    var denA = lineA[1];
+    var numB = lineB[0];
+    var denB = lineB[1];
+    var numR = (numA*numB).toString();
+    //alert(numR);
+    var denR = (denA*denB).toString();
+    //alert(denR);
+    var result = numR+':'+denR;
+    //alert(result);
+    return result;
 }
 
 var div = function(a,b){
-    return a/b;
+    //alert(`ебать делю ${a} на ${b}`);
+    var lineA = a.split(':');
+    var lineB = b.split(':');
+    var numA = lineA[0];
+    var denA = lineA[1];
+    var numB = lineB[0];
+    var denB = lineB[1];
+    var numR = (numA*denB).toString();
+    //alert(numR);
+    var denR = (denA*numB).toString();
+    //alert(denR);
+    var result;
+    if(numB=='0'){
+        result = 'division-error';
+    } else {
+    result= numR+':'+denR;
+    }
+    //alert(result);
+    return result;
 }
-
+/*
 var pow = function(a,b){
-    return a**b;
-}
+    //alert(`ебать возвожу ${a} в степень ${b}`);
+    var lineA = a.split(':');
+    var lineB = b.split(':');
+    var numA = lineA[0];
+    var denA = lineA[1];
+    var numB = lineB[0];
+    var denB = lineB[1];
+    var numR = ().toString();
+    //alert(numR);
+    var denR = ().toString();
+    //alert(denR);
+    
+    var result;
+    if(numA=='0'&&numB=='0'){
+        result = 'power-error-not-defined';
+    } else if (()&&((numA<0)!=(denA<0))){
+        result = 'power-error-complex-number';
+    } else {
+        result = numR+':'+denR;
+    }
+    return result;
+}*/
