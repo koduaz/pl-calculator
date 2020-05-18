@@ -13,6 +13,7 @@
 ///
 
 var operators = ['+','-','/','*','^','(',')'];
+var operatorByPrio = ['^','*','/','+','-'];
 var priority1 = ['^'];
 var priority2 = ['*','/'];
 var priority3 = ['+','-'];
@@ -27,39 +28,102 @@ var line;
 button.onclick = function(){
     var form = document.querySelector('input');
     line = form.value;
-
+    if(line!=''){
+    display(coolAnswer(count(toRPN(line))));
+    } else {
+        display('no-text');
+    }
 }
 
 button.ondblclick = function(){
-    toRPN(line);
-    //var a = pow(2,(1/2));
-    //alert(a);
 
+    //var a = pow(2,(1/2));
+    //alert(2.79535*100000);
+    //(coolAnswer(count(toRPN(line))));
+    //display(coolAnswer(count(toRPN(line))));
+    //alert('result lmao');
+    //alert(Math.round(((Math.pow((Math.pow(4,7)),1/9))+Number.EPSILON)*10000)/10000);
 }
 
+var whole = document.querySelector('#whole');
+var num = document.querySelector('.top');
+var den = document.querySelector('.bottom');
+var eq = document.querySelector('#equal');
+var ap = document.querySelector('#approx');
 
+var display = function(answer){
+    if(answer=='no-text'){
+        whole.innerHTML = 'Вы не ввели выражение';
+        num.innerHTML = '';
+        den.innerHTML = '';
+        eq.innerHTML = '';
+        ap.innerHTML = '';
+    } else if (answer=='div-error'){
+        whole.innerHTML = 'Делить на ноль запрещено';
+        num.innerHTML = '';
+        den.innerHTML = '';
+        eq.innerHTML = '';
+        ap.innerHTML = '';
+    } else if (answer=='pow-error'){
+        whole.innerHTML = 'Ошибка со степенями';
+        num.innerHTML = '';
+        den.innerHTML = '';
+        eq.innerHTML = '';
+        ap.innerHTML = '';
+    } else if (answer=='input-error'){
+        whole.innerHTML = 'Вы неверно ввели выражение';
+        num.innerHTML = '';
+        den.innerHTML = '';
+        eq.innerHTML = '';
+        ap.innerHTML = '';
+    } else {
+        var line = [];
+        line = answer.split(':');
+        //alert(line);
+        if(line[0]==''){
+            whole.innerHTML = line[0];
+            num.innerHTML = line[1];
+            den.innerHTML = line[2];
+            eq.innerHTML = '≈';
+            ap.innerHTML = +(line[1]/line[2]).toFixed(6);
+        } else if(line[0]=='-'){
+            whole.innerHTML = line[0];
+            num.innerHTML = line[1];
+            den.innerHTML = line[2];
+            eq.innerHTML = '≈';
+            ap.innerHTML = -(line[1]/line[2]).toFixed(6);
+        } else if(line.length==3){
+            whole.innerHTML = line[0];
+            num.innerHTML = line[1];
+            den.innerHTML = line[2];
+            eq.innerHTML = '≈';
+            ap.innerHTML = +line[0] + +(line[1]/line[2]).toFixed(6);
+        } else {
+            whole.innerHTML = line[0];
+            num.innerHTML = '';
+            den.innerHTML = '';
+            eq.innerHTML = ' ';
+            ap.innerHTML = ' ';
+        }
+    }
+}
 
 ///функция преобразования в опн 
 ///вход: строка выражения в обычной записи
 ///выход: строка в обратной польской нотации
 var toRPN = function(line){
     var sepLine = splitIntoTokens(line);
-    //alert(sepLine);
     var noMinusLine = checkMinuses(sepLine);
-    //alert(noMinusLine);
     var afterF = opn(noMinusLine);
-    //alert(afterF);
     var afterA = useFractions(afterF);
-    //alert(afterA);
-    var result = count(afterA);
-    alert(result);
+    return afterA;
 }
 
 ///функция разбиения выражения на токены (2 пункт)
 ///вход: строка в обычной записи
 ///выход: массив токенов
 var splitIntoTokens = function(line){
-    var array = Array.from(line);
+    var array = Array.from(line.split(' ').join(''));
     var i = array.length-1;
     for(i;i>0;i--){
         if(!(operands.includes(array[i-1])&&operands.includes(array[i]))){
@@ -143,7 +207,7 @@ var opn = function(tokens){
     return output;
 }
 
-///
+
 ///вход: массив токенов
 ///выход: массив токенов-объектов
 var useFractions = function(tokens){
@@ -151,14 +215,24 @@ var useFractions = function(tokens){
     var line = [];
     for(var i = 0;i<l;i++){
         if(!(operators.includes(tokens[i]))){
-            var fraction = `${tokens[i]}:1`;
-            line.push(fraction);
+ 
+            if(Array.from(tokens[i]).includes('.')){
+                var n = afterPoint(tokens[i],'.');
+                var fraction = `${tokens[i].split('.').join('')}:${10**n}`;
+                line.push(fraction);
+            } else if (Array.from(tokens[i]).includes(',')) {
+                var n = afterPoint(tokens[i],',');
+                var fraction = `${tokens[i].split(',').join('')}:${10**n}`;
+                line.push(fraction);
+            } else {
+                var fraction = `${tokens[i]}:1`;
+                line.push(fraction);
+            }
         }else{
             line.push(tokens[i]);
         }
     }
-    //alert(line);
-    return line;//line;
+    return line;
 }
 
 ///алгоритм подсчета строки ОПН
@@ -167,45 +241,152 @@ var useFractions = function(tokens){
 var count = function(line){
     var stack = [];
     var result;
-    var a;
-    var b;
     var l = line.length;
     for(var i = 0;i<l;i++){
         if(!(operators.includes(line[i]))){
             stack.push(line[i]);
             //alert('ебать закинул число в стэк');
         } else {
-            b = stack.pop();
-            a = stack.pop();
+            var b = stack.pop();
+            var a = stack.pop();
             switch (line[i]){
                 case '+':
                     result = sum(a,b);
-                    stack.push(result);
+                    stack.push(reduce(result));
                     break;
                 case '-':
                     result = sub(a,b);
-                    stack.push(result);
+                    stack.push(reduce(result));
                     break;
                 case '*':
                     result = mul(a,b);
-                    stack.push(result);
+                    stack.push(reduce(result));
                     break;
                 case '/':
                     result = div(a,b);
-                    stack.push(result);
+                    if(result=='error'){
+                        result='div-error';
+                        break;
+                    }
+                    stack.push(reduce(result));
                     break;
-               /* case '^':
+                case '^':
                     result = pow(a,b);
-                    stack.push(result);
-                    break; */
+                    if(result=='error'){
+                        result='pow-error';
+                        break;
+                    }
+                    stack.push(reduce(result));
+                    break; 
             }
             //alert('ебать я что-то посчитал '+ result);
+
         }
     }
-    if(stack.length!=1){
-        //alert('нихуя error');
+    if(result=='div-error'){
+        return result;
     }
+    if(result=='pow-error'){
+        return result;
+    }
+    if(stack.length!=1){
+        return 'Ебать ты сам понял че написал';
+    }
+    //alert(stack[0]);
     return stack[0];
+}
+
+//
+var coolAnswer = function(notCoolAnswer){
+    //alert(notCoolAnswer);
+    if(notCoolAnswer=='div-error'){
+        return 'div-error';
+    }
+    if(notCoolAnswer=='pow-error'){
+        return 'pow-error';
+    }
+    var red = reduce(notCoolAnswer);
+    var line = red.split(':');
+    var num = line[0];
+    var den = line[1];
+    //alert(num);
+    //alert(den);
+    //alert(parseInt(num,10)>parseInt(den,10));
+    if(den=='1'){
+        return num;
+    } else if(den=='-1'){
+        return -num;
+    } else if (100000000000%den==0){
+        var isNegative;
+        if(den*num<0){
+            isNegative = true;
+        } else {
+            isNegative = false;
+        }
+        num = Math.abs(num);
+        den = Math.abs(den);
+        var factor = 100000000000/den;
+        num = (num*factor).toFixed();
+        den = (den*factor).toFixed();
+        var anum = Array.from(num);
+        //alert(anum);
+    
+        var aden = Array.from(den);
+        //alert(aden);
+        var a;
+        var b;
+
+        do{
+            a = anum.pop();
+            b = aden.pop();
+        } while(!((a!='0')||(b!='0')));
+
+        anum.push(a);
+        aden.push(b);
+        //alert(anum);
+       // alert(aden);
+        num = Math.abs(parseInt(anum.join(''),10));
+        den = Math.abs(parseInt(aden.join(''),10));
+        var answer = [];
+        //alert(num>den);
+        if(num>den){
+            var modulo = num%den;
+            if(isNegative){
+                answer.push('-');
+            }
+            answer.push((num-modulo)/den);
+            answer.push('.');
+            //alert(modulo.toString().length);
+            for(var i = 0; i<(aden.length-modulo.toString().length-1);i++){
+                answer.push('0');
+            }
+            answer.push(modulo);
+            return answer.join('');
+        } else {
+            if(isNegative){
+                answer.push('-');
+            }
+            answer.push('0.');
+            for(var i = 0; i<(aden.length-anum.length-1);i++){
+                answer.push('0');
+            }
+            answer.push(num);
+            return answer.join('');
+        }
+        
+    } else {
+        if(Math.abs(parseInt(num,10))>Math.abs(parseInt(den,10))){
+            num = parseInt(num,10);
+            den = parseInt(den,10);
+            return `${(num-num%den)/den}:${Math.abs(num%den)}:${Math.abs(den)}`;
+        } else {
+            if(num*den<0){
+                return '-:'+`${Math.abs(num%den)}:${Math.abs(den)}`;
+            } else {
+                return ':'+`${Math.abs(num%den)}:${Math.abs(den)}`;
+            }
+        }
+    }
 }
 
 var sum = function(a,b){
@@ -268,16 +449,14 @@ var div = function(a,b){
     //alert(numR);
     var denR = (denA*numB).toString();
     //alert(denR);
-    var result;
     if(numB=='0'){
-        result = 'division-error';
+        return 'error';
     } else {
-    result= numR+':'+denR;
+        return numR+':'+denR;
     }
-    //alert(result);
-    return result;
 }
-/*
+
+
 var pow = function(a,b){
     //alert(`ебать возвожу ${a} в степень ${b}`);
     var lineA = a.split(':');
@@ -286,18 +465,52 @@ var pow = function(a,b){
     var denA = lineA[1];
     var numB = lineB[0];
     var denB = lineB[1];
-    var numR = ().toString();
-    //alert(numR);
-    var denR = ().toString();
-    //alert(denR);
-    
-    var result;
-    if(numA=='0'&&numB=='0'){
-        result = 'power-error-not-defined';
-    } else if (()&&((numA<0)!=(denA<0))){
-        result = 'power-error-complex-number';
+    if((numA*denA<0)&&(denB!='1')){
+        return 'error';
+    } else if (numA==0&&numB==0){
+        return 'error';
     } else {
-        result = numR+':'+denR;
+        var numR = Math.round(((Math.pow((Math.pow(numA,numB)),1/denB))+Number.EPSILON)*10000)/10000;
+        //alert(numR);
+        var denR = Math.round(((Math.pow((Math.pow(denA,numB)),1/denB))+Number.EPSILON)*10000)/10000;
+        //alert(denR);
+        var n = Math.max(afterPoint(numR,'.'),afterPoint(denR,'.'));
+        numR = (numR * Math.pow(10,n)).toFixed();
+        denR = (denR * Math.pow(10,n)).toFixed();
+        return numR+':'+denR;
     }
-    return result;
-}*/
+}
+
+///сокращение дроби
+var reduce = function(fraction){
+    var line = fraction.split(':');
+    var num = line[0];
+    var den = line[1];
+    if(fraction=='error' || den==0){
+        return 'error';
+    } else if (num==0){
+        return `${0}:${1}`;
+    } else {
+    var g = gcd(num,den);
+    num = num/g;
+    den = den/g;
+    return num+':'+den;
+    }
+}
+
+///нахождение НОД
+var gcd = function(a, b){
+    if (b===0) {
+        return a;
+    }
+    return gcd(b, a % b);
+}
+
+///сколько цифр после запятой
+var afterPoint = function(num,typeOfPoint){
+    if(num.toString().includes(typeOfPoint)){
+        return num.toString().split(typeOfPoint).pop().length;
+    } else {
+        return '0';
+    }
+}

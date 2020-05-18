@@ -1,0 +1,94 @@
+body, html {
+    background-color: rgb(244, 248, 252);
+    width: 100%;
+    height: 100%;
+    margin: 0em;
+    padding: 0em;
+}
+
+.main {
+    margin: 8px;
+    color: rgb(25, 27, 32);
+}
+
+div {
+    font-weight: bolder;
+}
+.title {
+    height: max-content;
+    width: 100%;
+    background-color: rgb(58,125,135);
+    padding: 0em;
+    margin: 0em;
+}
+
+.titletext {
+    color: rgb(255,255,255);
+	font-size: 35px;
+    font-family: 'Raleway', sans-serif;
+    text-align: center;
+    padding: 5px;
+}
+
+.part {
+    padding-top: 5px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+}
+
+input {
+    border-color: rgb(58,125,135);
+    border-style: solid;
+    max-height: 23px;
+    text-align: start;
+    text-indent: 2px;
+    font-weight: bold;
+}
+button {
+    height: 23px;
+    background-color: rgb(58,125,135);
+    border: none;
+    padding: 3px;
+    font: 700 13.33px Arial;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    height: 100%;
+}
+
+#whole {
+    padding-left: 5px;
+    text-align: left;
+}
+
+.bottom{
+    border-top: 1px solid #000;
+    display: block;
+
+}
+#equal{
+    margin: 5px;
+}
+
+.footertext {
+    color: rgb(255,255,255);
+    font-size: 25px;
+    font-family: 'Raleway', sans-serif;
+    text-align: center;
+    padding-top: 3px;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 35px;
+    background-color: rgb(58,125,135);
+    padding: 0em;
+    margin: 0em;
+}
+
+a {
+    color: rgb(255,255,255);
+}
