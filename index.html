@@ -5,16 +5,29 @@
         <title>Calculator</title>
         <script defer src="script.js"></script>
         <script defer src="noLetters.js"></script>
-        <link href="style.css" rel="styleshee">
+        <link href="style.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap" rel="stylesheet">
     </head>
     <body>
-        <div>
+        <div class="title">
+			<div class="titletext">Calculator</div> 
+		</div>
+        <div class="main">
             <div class="input">
                 <input type="text" id="input" placeholder="Введите выражение" onkeypress="noLetters()"><button>Вычислить</button>
             </div>
             <div class="output">
-
+                <div class="part" id="whole"> </div>
+                <div class="part" id="fraction">
+                    <div class="top"></div>
+                    <div class="bottom"></div>
+                </div>
+                <div class="part" id="equal"></div>
+                <div class="part" id="approx"></div>
             </div>
+        </div>
+        <div class="footer">
+            <div class="footertext">designed by <a href="https://github.com/koduaz">Levin A.</a>, IDEIT 417</div>
         </div>
     </body>
 </html>
